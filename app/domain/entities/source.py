@@ -15,12 +15,3 @@ class Source(BaseModel):
     content: str
     source_type: SourceType
 
-
-source = Source(
-    title="paper",
-    url="example.com",
-    content="this is good",
-    source_type=SourceType.WEB
-)
-
-print(source)

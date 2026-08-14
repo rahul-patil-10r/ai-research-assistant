@@ -16,6 +16,3 @@ class ResearchQuery(BaseModel):
     depth:Depth
     research_type:ResearchType
 
-
-research=ResearchQuery(question="expalin rag", depth="deep",research_type=ResearchType.TECHNICAL)
-print(research)

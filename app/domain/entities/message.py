@@ -10,6 +10,3 @@ class Message(BaseModel):
     role:MessageRole
     content:str
 
-
-message=Message(role=MessageRole.USER,content="what is rag" )
-print(message)
