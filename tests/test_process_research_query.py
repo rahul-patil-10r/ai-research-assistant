@@ -5,6 +5,8 @@ from app.domain.entities.source import Source
 from app.application.use_cases.process_research_query import ProcessResearchQuery
 from app.application.services.research_service import DefaultResearchService
 from app.application.orchestrators.research_orchestrator import ResearchOrchestrator
+from app.application.services.source_retriever import FakeSourceRetriever
+from app.application.services.answer_generator import FakeAnswerGenerator
 
 
 class FakeResearchOrchestrator(ResearchOrchestrator):
@@ -31,12 +33,17 @@ def test_process_research_query():
         research_type="technical"
     )
 
-    research_service = FakeResearchOrchestrator()
+    # research_service = FakeResearchOrchestrator()
+    source_retriever = FakeSourceRetriever()
+
+    answer_generator = FakeAnswerGenerator()
+    
+    research_service = DefaultResearchService(source_retriever,answer_generator)
 
     use_case = ProcessResearchQuery(research_service)
 
     result = use_case.execute(query)
-
+    
     assert isinstance(result, ResearchResult)
-    assert result.answer == "RAG stands for Retrieval-Augmented Generation."
-    assert len(result.sources) == 1
+    assert result.answer == "fake answer for :What is RAG? is "
+    assert len(result.sources) == 2     
