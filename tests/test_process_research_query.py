@@ -6,23 +6,11 @@ from app.application.use_cases.process_research_query import ProcessResearchQuer
 from app.application.services.research_service import DefaultResearchService
 from app.application.orchestrators.research_orchestrator import ResearchOrchestrator
 from app.application.services.source_retriever import FakeSourceRetriever
-from app.application.services.answer_generator import FakeAnswerGenerator
+from app.application.services.answer_generator import AnswerGenerator
+from app.application.services.source_retriever import WebSourceRetriever
+from app.infrastruture.llm.llm_service import OllamaLLMService
 
 
-class FakeResearchOrchestrator(ResearchOrchestrator):
-    
-    def research(self, query: ResearchQuery) -> ResearchResult:
-        source = Source(
-            title="RAG Paper",
-            url="https://example.com/rag",
-            content="RAG combines retrieval with generation.",
-            source_type="paper"
-        )
-
-        return ResearchResult(
-            answer="RAG stands for Retrieval-Augmented Generation.",
-            sources=[source]
-        )
 
 
 def test_process_research_query():
@@ -33,10 +21,11 @@ def test_process_research_query():
         research_type="technical"
     )
 
-    # research_service = FakeResearchOrchestrator()
-    source_retriever = FakeSourceRetriever()
+    llm_service=OllamaLLMService()
+    
+    source_retriever = WebSourceRetriever()
 
-    answer_generator = FakeAnswerGenerator()
+    answer_generator = AnswerGenerator(llm_service)
     
     research_service = DefaultResearchService(source_retriever,answer_generator)
 
@@ -44,6 +33,11 @@ def test_process_research_query():
 
     result = use_case.execute(query)
     
+
+    print("ANSWER IS : \n",result.answer)
+    print("\n")
+    print("SOURCES ARE : \n",result.sources)
+    
     assert isinstance(result, ResearchResult)
-    assert result.answer == "fake answer for :What is RAG? is "
-    assert len(result.sources) == 2     
+    assert len(result.answer) > 0
+    assert len(result.sources) > 0
