@@ -4,10 +4,10 @@ from app.domain.entities.research_result import ResearchResult
 from app.domain.entities.source import Source
 from app.application.use_cases.process_research_query import ProcessResearchQuery
 from app.application.services.research_service import DefaultResearchService
-from app.application.orchestrators.research_orchestrator import ResearchOrchestrator
+from app.application.orchestrators.research_orchestrator import DefaultResearchOrchestrator
 from app.application.services.source_retriever import FakeSourceRetriever
 from app.application.services.answer_generator import AnswerGenerator
-from app.application.services.source_retriever import WebSourceRetriever
+from app.infrastruture.retrieval.tavily_retrival_service import TavilySourceRetriever
 from app.infrastruture.llm.llm_service import OllamaLLMService
 
 
@@ -16,20 +16,22 @@ from app.infrastruture.llm.llm_service import OllamaLLMService
 def test_process_research_query():
 
     query = ResearchQuery(
-        question="What is RAG?",
+        question="What is vector database?",
         depth="deep",
         research_type="technical"
     )
 
     llm_service=OllamaLLMService()
     
-    source_retriever = WebSourceRetriever()
+    source_retriever = TavilySourceRetriever()
 
     answer_generator = AnswerGenerator(llm_service)
     
     research_service = DefaultResearchService(source_retriever,answer_generator)
 
-    use_case = ProcessResearchQuery(research_service)
+    research_orchestration=DefaultResearchOrchestrator(research_service)
+
+    use_case = ProcessResearchQuery(research_orchestration)
 
     result = use_case.execute(query)
     
